@@ -29,7 +29,7 @@ def app():
         print("1 - negative\n2 - positive")
         st.write("input: " + str(user_input))
         st.write("polarity: " + str(val-1))
-        print("hello world")
+       
     else:
         st.write("Enter the text for getting the results")
 
