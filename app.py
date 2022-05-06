@@ -37,7 +37,7 @@ def get_url(search_term):
     search_term = search_term.replace(' ','+')
     return template.format(search_term)
 
-def get_asin(driver,no):
+def get_asin(driver,no,no_prod):
     soup = BeautifulSoup(driver.page_source,'html.parser')
     for i in soup.find_all('div',{'data-component-type':'s-search-result'})[:no]:
         records.append(i['data-asin'])
@@ -46,7 +46,7 @@ def get_asin(driver,no):
         results.append(f"https://www.amazon.in/dp/product-reviews/{i}")
     for i in results:
         driver.get(i)
-    reviews_unit(results)
+    reviews_unit(results,no_prod)
 
 def clear_reviews(rev):
     for i in rev:
@@ -67,12 +67,12 @@ def clear_reviews(rev):
             rev1.append(text)  
 
 dicton_reviews={}
-def reviews_unit(results):
+def reviews_unit(results,no_prod):
     for j in range(len(results)):
         lst_rev = []
         page=requests.get(results[j],headers=header)
         soup=BeautifulSoup(page.content)
-        for i in soup.findAll("span",{'data-hook':"review-body"})[:10]:
+        for i in soup.findAll("span",{'data-hook':"review-body"})[:no_prod]:
 
             rev.append(i.text)
             lst_rev.append(i.text)
@@ -83,13 +83,16 @@ def reviews_unit(results):
 
 
 def app():
-    driver = webdriver.Edge('C:/Users/Hansel/edgedriver_win64/msedgedriver.exe')
+    driver = webdriver.Edge(r'C:/Users/Hansel/Desktop/edgedriver_win64/msedgedriver.exe')
+    st.title("AMAZON")
+
     term =  st.text_input("Enter what you want:")
-    no = int(st.number_input("Enter the number of products:"))
+    no = st.number_input("Enter the number of Products:",0,100,10)
+    no_prod = st.number_input("Enter No of reviews per Product: ",0,100,10)
     url = get_url(term)
     print(url)
     driver.get(url)
-    get_asin(driver,no)
+    get_asin(driver,no,no_prod)
     # st.write(len(rev1))
     # st.table(rev1)
 
@@ -105,5 +108,4 @@ def app():
     else:
         st.write("Enter the text for getting the results")
 
-ex = ["This bad. bad for work from home. The actual screen size is 32 cm x 70 cm. This is good for software people. Video play is also bad."]
 app()
